@@ -1,0 +1,247 @@
+{% extends 'forum-admin/base.html' %}
+
+{% load static %}
+{% load forum_tags %}
+
+{% block title %}Forum{% endblock %}
+
+{% block head %}
+<style>
+    .indicator {
+        display: block !important;
+        width: auto !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="text-white max-w-screen-2xl mx-auto mt-16 flex">
+    <div class="flex-grow">
+        <div class="card w-auto bg-base-100 border border-gray-800 border-2 mb-5">
+            <figure class="px-3 pt-3">
+                <img src="https://www.lawlessrp.com/images/updates/2023/winter/logo.png" alt="Shoes" class="rounded-md w-96" />
+            </figure>
+            <div class="card-body items-center text-center p-3">
+                <h2 class="card-title">{{ request.user.profile }}, we wish you a Merry Christmas!</h2>
+                <p>Click <a class="link no-underline text-primary font-semibold">here</a> to visit our announcement!</p>
+            </div>
+        </div>
+        <span class="latest-post-title font-bold">Latest Posts</span>
+        {% for post in five_latest_posts %}
+        <div class="mt-3 rounded">
+            <div class="py-4 bg-gray-800 hover:bg-gray-700 mt-1 rounded ">
+                <div class="flex justify-between items-center px-4">
+                    <div class="flex items-center">
+                        <div class="flex items-center mr-4">
+                            <img src="{{ post.author.image.url }}" alt="{{ post.author }}" class="h-10 w-10 rounded-full mr-3 border border-neutral">
+                            <div class="ml-2 lg:w-96 md:w-64 sm:w-40"> <!-- Adjust the width here -->
+                                <div class="font-semibold break-words thread-title">
+                                    <a class="link no-underline text-gray-300" href="{% url 'view-post-page' title_slug=post.slug %}">
+                                        {{ post.title }}
+                                    </a>
+                                </div>
+                                <div class="text-gray-400 text-sm"><a class="link no-underline">{{ post.author }}</a> · <a class="link no-underline" href="{% url 'view-post-page' title_slug=post.slug %}">{{ post.formatted_created_at }}</a> · <a class="link no-underline">{{ post.node.name }}</a><span class="sm:hidden"> · Replies: {{ post.total_replies }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden sm:flex flex-col space-y-1 lg:w-28 md:w-20 sm:w-20 lg:mr-28 sm:mr-16">
+                            <div class="flex justify-between">
+                                <div class="font-semibold text-sm text-gray-400">
+                                    Replies:
+                                </div>
+                                <div class="font-semibold text-sm text-white">
+                                    {{ post.total_replies }}
+                                </div>
+                            </div>
+                            <div class="flex justify-between">
+                                <div class="font-semibold text-xs text-gray-400">
+                                    Views:
+                                </div>
+                                <div class="font-semibold text-xs text-white">
+                                    {{ post.total_views }}
+                                </div>
+                            </div>
+                        </div>              
+                        <div class="divider divider-horizontal mr-5"></div>     
+                        <div class="text-end lg:mr-28 sm:mr-16 hidden sm:block lg:w-40 md:w-32 sm:w-16">
+                            <div class="font-semibold text-gray-300 text-sm"><a class="link no-underline whitespace-break-spaces">{{ post.get_latest_reply.formatted_created_at }}</a></div>
+                            <div class="text-gray-400 text-sm"><a class="link no-underline whitespace-break-spaces">{{ post.get_latest_reply_author.name }}</a></div>
+                        </div>
+                        <img src="{{ post.get_latest_reply_author.image.url }}" alt="{{ post.get_latest_reply_author }}" class="h-7 w-7 rounded-lg mr-3 hidden sm:block border border-neutral">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    
+        <br>
+    
+        <span class="latest-post-title font-bold mt-3">Forum</span>
+        {% for forum in forums %}
+        <div class="mt-4 rounded"> 
+            <!-- add indicator if indicator needed -->
+            <!-- <span class="indicator-item indicator-center badge">{{ forum.upper_title }}</span> -->
+            <div class="py-4 bg-gray-900 mt-1 rounded-t-md">
+                <div class="flex justify-between items-center px-4">
+                    <div class="flex items-center">
+                        <div class="flex items-center mr-4">
+                            <i data-feather="{{ forum.feather_icon }}" class="h-7 w-7 rounded-lg mr-3 ml-2 hidden sm:block"></i>
+                            <div class="ml-2 lg:w-96 md:w-64 sm:w-40"> <!-- Adjust the width here -->
+                                <div class="font-semibold break-words thread-title">
+                                    <a class="link no-underline">
+                                        {{ forum.upper_title }}
+                                    </a>
+                                </div>
+                                <div class="text-gray-400 text-sm">
+                                    {{ forum.description }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% for node in forum.nodes.all %}
+            {% is_new_post_in_node node request.user.profile as INPIN %}
+            <div class="py-4 bg-gray-800 border-t-2 border-gray-700 {% if forloop.last %}rounded-b-md{% endif %}">
+                <div class="flex justify-between items-center px-4">
+                    <div class="flex items-center">
+                        <div class="flex items-center mr-4">
+                            <i data-feather="corner-down-right" class="text-gray-400 mr-5 ml-3"></i>
+                            <div class="ml-2 lg:w-96 md:w-64 sm:w-40">
+                                <div class="font-semibold break-words thread-title">
+                                    <a class="link no-underline">
+                                        {{ node }} {% if INPIN %}<div class="badge badge-warning badge-sm text-xs">NEW</div>{% endif %}
+                                    </a>
+                                </div>
+                                <div class="text-gray-400 text-sm">
+                                    {{ node.description }}
+                                    <span class="sm:hidden">
+                                        · Replies: {{ post.total_replies }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden sm:flex items-center lg:w-32 md:w-20 sm:w-20 lg:mr-28 sm:mr-16">
+                            <div class="flex flex-col items-center mr-4">
+                                <div class="font-semibold text-xs text-gray-400">
+                                    Messages:
+                                </div>
+                                <div class="font-semibold text-xs text-white">
+                                    {{ node.total_replies }}
+                                </div>
+                            </div>
+                            <div class="divider divider-horizontal m-0"></div>  
+                            <div class="flex flex-col items-center ml-4">
+                                <div class="font-semibold text-xs text-gray-400">
+                                    Posts:
+                                </div>
+                                <div class="font-semibold text-xs text-white">
+                                    {{ node.total_posts }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="divider divider-horizontal mr-5"></div>  
+                        <div class="text-end lg:mr-28 sm:mr-16 hidden sm:block lg:w-40 md:w-32 sm:w-16">
+                            <div class="font-semibold text-gray-300 text-sm"><a class="link no-underline whitespace-break-spaces">{{ node.get_latest_post_or_reply.formatted_updated_at }}</a></div>
+                            <div class="text-gray-400 text-sm"><a class="link no-underline whitespace-break-spaces">{{ node.get_latest_post_or_reply.author }}</a></div>
+                        </div>
+                        {% if node.get_latest_post_or_reply.author.image.url %}
+                        <img src="{{ node.get_latest_post_or_reply.author.image.url }}" alt="Avatar" class="h-7 w-7 rounded-lg mr-3 hidden sm:block border border-neutral">
+                        {% else %}
+                        <i data-feather="wind" class="h-7 w-7 rounded-lg mr-3 hidden sm:block"></i>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% if forloop.last %}
+        <div class="mb-16"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="hidden lg:block md:hidden sm:hidden w-72 ml-5">
+        <div class="h-auto p-4 bg-gray-800 rounded">
+            <div>
+                <div class="flex break-all">
+                    <div class="avatar">
+                        <div class="w-20 rounded-md">
+                            <img src="{{ request.user.profile.image.url }}" alt="{{ request.user.profile }}" class="object-cover w-full h-full" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-grow ml-3">
+                        <div class="font-bold text-white text-sm">
+                            <a class="link no-underline">
+                                {{ request.user.profile.get_name_with_color }}
+                            </a>
+                        </div>
+                        <div class="text-gray-400 text-sm">
+                            {{ request.user.profile.get_first_membership }}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-gray-400 text-sm mt-2 flex justify-between">
+                    <div class="text-start">Messages:</div>
+                    <div class="text-end">{{ request.user.profile.get_total_messages }}</div>
+                </div>
+                <div class="text-gray-400 text-sm flex justify-between">
+                    <div class="text-start">Reaction Score:</div>
+                    <div class="text-end">{{ request.user.profile.get_total_likes }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="h-auto p-4 bg-gray-800 mt-2 rounded">
+            <div class="flex flex-col mt-2 font-bold text-center">
+                <span class="text-white">STATUS UPDATES</span>
+                <div class="divider my-2"></div>
+            </div>
+            <div>
+                <label class="form-control w-full max-w-xs">
+                    <div class="label">
+                        <span class="label-text text-xs">Update your status</span>
+                    </div>
+                    <div class="join">
+                        <input type="text" placeholder="Type here" class="input input-bordered input-sm w-full max-w-xs mb-4 join-item bg-gray-900 focus:outline-none" />
+                        <button class="btn join-item input-bordered bg-gray-900 rounded-r-full btn-sm hover:bg-gray-900">Submit</button>
+                    </div>
+                </label>
+
+                {% for status in statuses %}
+                <div class="flex {% if not forloop.first %}mt-2{% endif %} break-all">
+                    <div class="avatar">
+                        <div class="w-8 h-8 rounded-md mt-1">
+                            <a class="link no-underline">
+                                <img src="{{ status.author.image.url }}" alt="{{ status.author }}" class="object-cover w-full h-full" />
+                            </a>
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-grow ml-3">
+                        <div class="font-bold text-white text-sm">
+                            <a class="link no-underline">
+                                {{ status.author.get_name_with_color }}
+                            </a>
+                        </div>
+                        <div class="text-gray-400 text-sm">
+                            {{ status.content }}
+                        </div>
+                        <div class="text-gray-400 text-xs mt-1">
+                            <div class="divider divider-start m-0">
+                                <a class="link no-underline">
+                                    {{ status.formatted_created_at }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

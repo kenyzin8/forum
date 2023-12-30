@@ -1,0 +1,102 @@
+{% extends 'forum-admin/base.html' %}
+
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block head %}
+<script src="{% static 'ckeditor/js/ckeditor.js' %}"></script>
+<link rel="stylesheet" href="{% static 'ckeditor/css/styles.css' %}">
+<style>
+.ck-content table {
+    pointer-events: none !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="text-white max-w-screen-xl mx-auto mt-16">
+    <div class="text-sm text-slate-400 breadcrumbs">
+        <ul>
+            <li><a>Home</a></li> 
+            <li><a>Documents</a></li> 
+            <li>Add Document</li>
+        </ul>
+    </div>
+    <label class="form-control w-full mb-3">
+        <div class="label">
+            <span class="label-text">Title</span>
+        </div>
+        <div class="join">
+            <select class="select select-bordered join-item" style="background: #1C1C1C !important;">
+                <option disabled selected>Prefix</option>
+                <option>No Prefix</option>
+                {% for prefix in prefixes %}
+                    <option data-color="{{ prefix.color }}">{{ prefix.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" placeholder="Type here" class="input input-bordered w-full join-item" style="background: #1C1C1C !important;"/>
+        </div>
+    </label>
+    <span class="label-text">Content</span>
+    <div class="row row-editor mt-2">
+        <div class="editor-container">            
+            <div class="editor ">
+            </div>
+            <div id="comment-word-count" class="flex justify-between items-center">
+                <div class="text-xs">
+                    Words: <span id="word-count-body"></span><br>
+                    Characters: <span id="character-count-body"></span>
+                </div>
+                <button class="btn btn-sm btn-wide btn-neutral no-animation" id="btn-submit-post">Post</button>
+            </div>
+        </div>
+    </div>
+</div>
+<dialog id="submit-post-modal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Are you sure you want to submit this post?</h3>
+    <p class="py-4">Press ESC key or click the button below to close</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn btn-sm">Close</button>
+        <button class="btn btn-sm btn-success ml-3" id="btn-submit-post-modal-yes" type="submit">Yes</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'ckeditor/js/script.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editor = window.watchdog.editor;
+        
+        const toolbarElement = editor.ui.view.toolbar.element;
+        const wordCounterElement = document.getElementById( 'word-count' );
+
+        editor.on( 'change:isReadOnly', ( evt, propertyName, isReadOnly ) => {
+            console.log( 'The "isReadOnly" property has changed to', isReadOnly)
+            if ( isReadOnly ) {
+                toolbarElement.style.display = 'none';
+                wordCounterElement.style.display = 'none';
+            } else {
+                toolbarElement.style.display = 'flex';
+                wordCounterElement.style.display = 'flex';
+            }
+        } );
+
+        const btnSubmit = document.getElementById('btn-submit-post');
+        btnSubmit.onclick = function() {
+            const dialog = document.getElementById('submit-post-modal');
+            dialog.showModal();
+            dialog.querySelector('form').addEventListener('submit', () => {
+                editor.enableReadOnlyMode( 'my-feature-id' );
+                editor.isReadOnly; 
+                console.log(editor.getData());
+            });
+        }
+    });
+</script>
+{% endblock %}

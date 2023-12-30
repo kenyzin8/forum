@@ -1,0 +1,309 @@
+{% extends 'forum-admin/base.html' %}
+
+{% load static %}
+{% load forum_tags %}
+
+{% block title %}Home{% endblock %}
+
+{% block head %}
+<script src="{% static 'ckeditor/js/ckeditor.js' %}"></script>
+<link rel="stylesheet" href="{% static 'ckeditor/css/styles.css' %}">
+<style>
+    :root{
+        --ck-color-widget-blurred-border: transparent;
+    }
+
+    .ck-rounded-corners .ck.ck-editor__main>.ck-editor__editable, .ck.ck-editor__main>.ck-editor__editable.ck-rounded-corners{
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+
+    .card {
+        border-radius: 4px !important;
+    }
+
+    #new-reply{
+        scroll-margin: 100px;
+    }
+
+    .editor-container{
+        background: #1C1C1C !important;
+    }
+
+    .ck-content-border{
+        border: 1px solid #333333 !important;
+        
+    }
+
+    #reply-content,
+    #post-content{
+        padding: 0 var(--ck-spacing-standard);
+    }
+
+    .ck-content p a{
+        word-wrap: break-word;
+    }
+
+    .indicator {
+        display: block !important;
+        width: auto !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="text-white max-w-screen-xl mx-auto mt-16 mb-16">
+    {% if post.prefix %}<div class="badge" id="prefix-badge" style="{{ post.prefix.get_prefix_style }}">{{ post.prefix }}</div> {% endif %}{{ post.title|safe }}
+    <div class="text-sm text-slate-400 breadcrumbs mb-2">
+        <ul>
+            <li><a href="{% url 'forum-page' %}">Forum</a></li>
+            {% for crumb in breadcrumbs %}
+                <li>
+                    <a>{{ crumb.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="post-container {% if post.is_locked %}indicator{% endif %}">
+        <div class="row row-editor mt-2 mb-3 ">
+            <div class="editor-container">     
+                <div class="p-3 mt-2 border border-gray-800 author-panel">
+                    <div class="flex items-center space-x-4">
+                        <div class="avatar ml-2">
+                            <div class="w-24 rounded-full ring ring-offset-base-100 ring-offset-2" style="--tw-ring-color: {{ post.author.get_color }};">
+                                <img src="{{ post.author.image.url }}" alt="{{ post.author.name }}"/>
+                            </div>
+                        </div>
+                        <!-- <img src="{{ post.author.image.url }}" alt="{{ post.author.name }}" class="w-24 rounded-md border-2 border-gray-600"/> -->
+                        <div>
+                            <div class="font-bold">
+                                <div class="text-white">
+                                    {{ post.author.get_name_with_color }}<br>
+                                    {% for membership in post.author.groupmembership_set.all %}
+                                        <kbd class="kbd kbd-sm mr-1" style="{{ membership.user_group.get_ug_style }}">{{ membership.user_group.name }}</kbd>
+                                    {% endfor %}
+                                </div>
+                                <kbd class="kbd kbd-sm text-xs text-gray-500 ">
+                                    Member Since: {{ post.author.user.date_joined|date:"F d, Y" }}
+                                </kbd>
+                            </div>
+                        </div>
+                    </div>
+                </div>        
+                <div class="ck-content-border">
+                    <div class="ck-content" id="post-content">
+                        {{ post.content|safe }}
+                    </div>
+                </div>
+                <div id="date-posted" class="flex justify-between items-center">
+                    <div class="text-xs py-2">
+                        {{ post.formatted_created_at }}
+                        ·
+                        <span class="mr-2">Liked by <span class="like-post-count">{{ post.likes.count }}</span> people</span>
+                    </div>
+                    <div class="text-end mr-2"> 
+                        <div>
+                            {% if request.user.profile == post.author %}
+                            <a class="link link-primary text-orange-500 no-underline edit-button ml-2" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
+                                Edit
+                            </a>
+                            ·
+                            {% endif %}
+                            <button class="link link-primary text-orange-500 no-underline report-button" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
+                                Report
+                            </button>
+                            ·
+                            <button class="link link-primary text-orange-500 no-underline like-button" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
+                                {% is_post_liked post request.user.profile as user_liked_post %}
+                                {% if user_liked_post %}Liked{% else %}Like{% endif %}
+                            </button>
+                            {% if not post.is_locked %}
+                            ·
+                            <button class="link link-primary text-orange-500 no-underline reply-button" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
+                                Reply
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if post.is_locked %}
+        <span class="indicator-item indicator-top indicator-center badge badge-warning font-bold">
+            <div class="tooltip" data-tip="Post Locked"><i data-feather="lock" style="width: 15px;"></i></div>
+        </span>
+        
+        {% endif %}
+    </div>
+
+    <br>
+    
+    <span class="text-dark text-xs font-bold">Replies (Showing {{ replies|length }} of {{ all_replies_count }})</span>
+    
+    <div class="replies-container">
+        {% for reply in replies %}
+        <div class="row row-editor mt-2 reply-container">
+            <div class="editor-container">    
+                <div class="p-3 mt-2 border border-gray-800 author-panel">
+                    <div class="flex items-center space-x-4">
+                        <div class="avatar ml-2">
+                            <div class="w-24 rounded-full ring ring-offset-base-100 ring-offset-2" style="--tw-ring-color: {{ reply.author.get_color }};">
+                                <img src="{{ reply.author.image.url }}" alt="{{ reply.author.name }}"/>
+                            </div>
+                        </div>
+                        <!-- <img src="{{ reply.author.image.url }}" alt="{{ reply.author.name }}" class="w-16 h-16 rounded-md border-2 border-gray-600"/> -->
+                        <div>
+                            <div class="text-white font-bold">
+                                {{ reply.author.get_name_with_color }}<br>
+                                {% for membership in reply.author.groupmembership_set.all %}
+                                    <kbd class="kbd kbd-sm mr-1" style="{{ membership.user_group.get_ug_style }}">{{ membership.user_group.name }}</kbd>
+                                {% endfor %}<br>
+                                <kbd class="kbd kbd-sm text-xs text-gray-500 ">
+                                    Member Since: {{ reply.author.user.date_joined|date:"F d, Y" }}
+                                </kbd>
+                            </div>
+                        </div>
+                    </div>
+                </div>         
+                <div class="ck-content-border">
+                    <div class="ck-content" id="reply-content">
+                        {{ reply.content|safe }}
+                    </div>
+                </div>
+                <div id="date-posted" class="flex justify-between items-center">
+                    <div class="text-xs py-2">
+                        {{ reply.formatted_created_at }}
+                        ·
+                        <span class="mr-2">Liked by <span class="like-post-count">{{ reply.likes.count }}</span> people</span>
+                    </div>
+                    <div class="text-end mr-2"> 
+                        <div>
+                            {% if request.user.profile == reply.author %}
+                            <a class="link link-primary text-orange-500 no-underline edit-button ml-2" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
+                                Edit
+                            </a>
+                            ·
+                            {% endif %}
+                            <button class="link link-primary text-orange-500 no-underline report-button" data-reply-id="{{ reply.id }}" data-reply-user="{{ reply.author.name }}">
+                                Report
+                            </button>
+                            ·
+                            <button class="link link-primary text-orange-500 no-underline like-button" data-reply-id="{{ reply.id }}" data-reply-user="{{ reply.author.name }}">
+                                {% is_reply_liked reply request.user.profile as user_liked_post %}
+                                {% if user_liked_post %}Liked{% else %}Like{% endif %}
+                            </button>
+                            {% if not post.is_locked %}
+                            ·
+                            <button class="link link-primary text-orange-500 no-underline reply-button" data-reply-id="{{ reply.id }}" data-reply-user="{{ reply.author }}">
+                                Reply
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+   
+    <div class="join mt-3">
+        {% if replies.has_previous %}
+            <a href="?page={{ replies.previous_page_number }}" class="join-item btn btn-sm">«</a>
+        {% else %}
+            <button class="join-item btn btn-sm" disabled>«</button>
+        {% endif %}
+    
+        {% for num in replies.paginator.page_range %}
+            {% if replies.number == num %}
+                <button class="join-item btn btn-sm btn-active">{{ num }}</button>
+            {% else %}
+                <a href="?page={{ num }}" class="join-item btn btn-sm">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+    
+        {% if replies.has_next %}
+            <a href="?page={{ replies.next_page_number }}" class="join-item btn btn-sm">»</a>
+        {% else %}
+            <button class="join-item btn btn-sm" disabled>»</button>
+        {% endif %}
+    </div>
+
+    {% if request.user.is_authenticated %}
+    {% if not post.is_locked %}
+    <div class="row row-editor mt-3" id="new-reply">
+        <div class="comment-editor-container">      
+            <div class="text-dark text-xs font-bold mb-2 ml-2">Reply</div>   
+            <div class="comment-editor">
+
+            </div>
+            <div id="comment-word-count" class="flex justify-between items-center">
+                <div class="text-xs">
+                    Words: <span id="comment-word-count-body"></span><br>
+                    Characters: <span id="comment-character-count-body"></span>
+                </div>
+                <button class="btn btn-sm btn-wide btn-neutral no-animation" id="btn-submit-post">Reply</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <div class="rounded viewers mt-4 p-4" style="background: #1C1C1C;">
+        Post Viewers <span class="text-xs">(Total: {{ post.views.count }})</span>
+        <hr class="mt-2 h-1 bg-gray-700 border-0 rounded">
+        <div class="users-viewers mt-2 text-xs">
+            {% for viewer in post.views.all %}
+                {{ viewer.get_name_with_color }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="text-sm text-slate-400 breadcrumbs mt-5 ml-2">
+        <ul>
+            <li><a href="{% url 'forum-page' %}">Forum</a></li>
+            {% for crumb in breadcrumbs %}
+                <li>
+                    <a>{{ crumb.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<dialog id="submit-post-modal" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Are you sure you want to submit this reply?</h3>
+      <div class="modal-action">
+        <form method="dialog">
+          <button class="btn btn-sm">Close</button>
+          <button class="btn btn-sm btn-success ml-3 text-white" id="btn-submit-post-modal-yes" type="submit">Yes</button>
+        </form>
+      </div>
+    </div>
+</dialog>
+<div class="toast hidden" id="empty-reply-toast">
+  <div class="alert" style="background: maroon;">
+    <span class="text-white">Empty reply post.</span>
+  </div>
+</div>
+{{ replies_json|json_script:"replies_data" }}
+{% endblock %}
+{% block scripts %}
+<script>
+    var repliesLength = '{{ replies|length }}'
+    var repliesData = JSON.parse(document.getElementById('replies_data').textContent);
+    repliesData = JSON.parse(repliesData)
+    var postID = '{{ post.id }}'
+    postID = parseInt(postID)
+    var submitReplyURL = "{% url 'submit-reply-page' 0 %}".replace('0', postID);
+    var getPostContentURL = "{% url 'get-post-content-page' %}";
+    var likePostURL = "{% url 'like-post-page' %}";
+    var csrfToken = '{{ csrf_token }}'
+    var isPostLocked = '{{ post.is_locked }}'
+    isPostLocked = isPostLocked == 'True'
+</script>
+<script src="{% static 'ckeditor/js/posts/script.js' %}"></script>
+{% if not post.is_locked %}
+<script src="{% static 'ckeditor/js/posts/comment-script.js' %}"></script>
+{% endif %}
+{% endblock %}

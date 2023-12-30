@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="myForum is a forum website where you can post your questions and get answers from other users.">
+    <meta name="author" content="Kent J.">
+
+    <link rel="icon" type="image/x-icon" href="{% static 'images/fav.png' %}"/>
+    
+    <title>myForum | {% block title %}{% endblock %}</title>
+
+    <script src="{% static 'feather-icons/js/feather.min.js' %}"></script>
+    <script src="{% static 'jQuery/jquery-3.6.4.min.js' %}"></script>
+    <script src="{% static 'daisy/js/full.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'daisy/css/full.min.css' %}"/>
+    <script>
+        function showError(message){
+            var errorModal = document.getElementById('error-modal')
+            errorModal.querySelector('.modal-body').textContent = message
+            errorModal.showModal()
+        }
+        function showSuccess(message){
+            var successModal = document.getElementById('success-modal')
+            successModal.querySelector('.modal-body').textContent = message
+            successModal.showModal()
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1D232A; 
+        }
+         
+        ::-webkit-scrollbar-thumb {
+            background: #121212; 
+            border-radius: 1px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #121212; 
+            border-radius: 5px;
+        }
+
+        .drawer{
+            width: initial;
+            z-index: 49;
+        }
+
+        .no-scroll{
+            margin-right: 5px !important;
+            overflow-y: hidden;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="no-scroll flex flex-col min-h-screen">
+    {% include 'forum-admin/loader.html' %}
+    {% include 'forum-admin/navbar.html' %}
+    <main class="m-5 content-start flex-grow m-5 content-start">
+        {% block content %}
+        {% endblock %}
+    </main>
+    <dialog id="error-modal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Oops, there was an error...</h3>
+            <p class="py-4 modal-body"></p>
+            <div class="modal-action">
+            <form method="dialog">
+                <button class="btn">OK</button>
+            </form>
+            </div>
+        </div>
+    </dialog>
+    <dialog id="success-modal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Success!</h3>
+            <p class="py-4 modal-body"></p>
+            <div class="modal-action">
+            <form method="dialog">
+                <button class="btn">OK</button>
+            </form>
+            </div>
+        </div>
+    </dialog>
+    {% include 'forum-admin/footer.html' %}
+    {% block scripts %}{% endblock %}
+    <script>
+      feather.replace();
+    </script>
+</body>
+</html>
