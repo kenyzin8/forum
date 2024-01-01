@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.humanize',
     'colorfield',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'websocket_handler',
+    'auth_forum'
 ]
 
 MIDDLEWARE = [
@@ -57,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middlewares.MinifyHTMLMiddleware',
+    'core.middlewares.ActivityMiddleware',
 ]
 
 ROOT_URLCONF = 'forum.urls'
@@ -165,3 +169,9 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+OFFLINE_TRESHOLD_MINUTES = 1
+OFFLINE_TRESHOLD_SECONDS = 60 * OFFLINE_TRESHOLD_MINUTES
+
+LOGIN_REDIRECT_URL = 'home'
+LOGIN_URL = 'login-page'

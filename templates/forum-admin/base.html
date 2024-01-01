@@ -29,6 +29,10 @@
         }
     </script>
     <style>
+        html{
+            scroll-behavior: smooth;
+        }
+
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -38,12 +42,13 @@
         }
          
         ::-webkit-scrollbar-thumb {
-            background: #121212; 
+            background: #4e4e4e; 
             border-radius: 1px;
+            padding: 10px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: #121212; 
+            background: #4e4e4e; 
             border-radius: 5px;
         }
 
@@ -56,10 +61,11 @@
             margin-right: 5px !important;
             overflow-y: hidden;
         }
+
     </style>
     {% block head %}{% endblock %}
 </head>
-<body class="no-scroll flex flex-col min-h-screen">
+<body class="no-scroll flex flex-col min-h-screen" data-theme="dark">
     {% include 'forum-admin/loader.html' %}
     {% include 'forum-admin/navbar.html' %}
     <main class="m-5 content-start flex-grow m-5 content-start">

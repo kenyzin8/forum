@@ -1,0 +1,57 @@
+{% extends 'forum-admin/base.html' %}
+
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block head %}
+<style>
+    .no-scroll{
+        margin-right: 0px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="text-white max-w-screen-2xl mx-auto mt-16 flex">
+    <div class="hero">
+        <div class="hero-content text-center">
+          <div class="max-w-md">
+            <h1 class="text-5xl font-bold">Login</h1>
+            <form method="POST">
+                {% csrf_token %}
+                <label class="form-control w-full max-w-xs mt-7">
+                    <div class="label">
+                        <span class="label-text">Enter username</span>
+                    </div>
+                    {{ form.username }}
+                </label>
+                <label class="form-control w-full max-w-xs mt-3">
+                    <div class="label">
+                        <span class="label-text">Enter password</span>
+                    </div>
+                    {{ form.password }}
+                </label>
+                <button type="submit" class="btn btn-gray-300 w-96 max-w-xs rounded-md mt-3">Get Started</button><br>
+
+                <div class="mt-3">
+                    <a class="link no-underline text-sm text-gray-400 font-semibold">Forgot password?</a>
+                </div>
+            </form>
+            {% if messages %}
+                {% for message in messages %}
+                    <div role="alert" class="alert mt-4 rounded-md flex">
+                        <div class="mx-auto">
+                            <span class="ml-2">❌&nbsp;<span class="text-sm text-red-500 ml-1">{{ message }}</span></span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

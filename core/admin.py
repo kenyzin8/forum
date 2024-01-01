@@ -7,7 +7,7 @@ class ForumAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description')
 
 class NodeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'parent')
+    list_display = ('name', 'description')
     search_fields = ('name', 'description')
 
 class GroupMembershipInline(admin.TabularInline):
@@ -15,7 +15,7 @@ class GroupMembershipInline(admin.TabularInline):
     extra = 1 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'phone', 'address', 'description', 'image')
+    list_display = ('name', 'email', 'phone', 'address', 'description', 'image', 'last_activity')
     search_fields = ('name', 'email', 'phone', 'address', 'description')
     inlines = [GroupMembershipInline, ]  
 
@@ -28,7 +28,7 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('title', 'content')
 
 class ReplyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'content', 'author')
+    list_display = ('id', 'content', 'author', 'post', 'created_at', 'updated_at', 'is_active')
     search_fields = ('content', 'author')
 
 class ReactionAdmin(admin.ModelAdmin):
@@ -47,6 +47,10 @@ class StatusAdmin(admin.ModelAdmin):
     list_display = ('author', 'content')
     search_fields = ('author', 'content')
 
+class PostViewAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post', 'last_viewed')
+    search_fields = ('user', 'post', 'last_viewed')
+
 admin.site.register(Forum, ForumAdmin)
 admin.site.register(Node, NodeAdmin)
 admin.site.register(Profile, ProfileAdmin)
@@ -57,3 +61,4 @@ admin.site.register(Reaction, ReactionAdmin)
 admin.site.register(Prefix, PrefixAdmin)
 admin.site.register(UserGroup, UserGroupAdmin)
 admin.site.register(Status, StatusAdmin)
+admin.site.register(PostView, PostViewAdmin)

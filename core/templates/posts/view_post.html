@@ -3,7 +3,7 @@
 {% load static %}
 {% load forum_tags %}
 
-{% block title %}Home{% endblock %}
+{% block title %}{{ post }}{% endblock %}
 
 {% block head %}
 <script src="{% static 'ckeditor/js/ckeditor.js' %}"></script>
@@ -53,17 +53,17 @@
 
 {% block content %}
 <div class="text-white max-w-screen-xl mx-auto mt-16 mb-16">
-    {% if post.prefix %}<div class="badge" id="prefix-badge" style="{{ post.prefix.get_prefix_style }}">{{ post.prefix }}</div> {% endif %}{{ post.title|safe }}
+    {% if post.prefix %}<div class="badge border-0 drop-shadow-none rounded-md" id="prefix-badge" style="{{ post.prefix.get_prefix_style }}">{{ post.prefix }}</div> {% endif %}{{ post.title|safe }}
     <div class="text-sm text-slate-400 breadcrumbs mb-2">
         <ul>
             <li><a href="{% url 'forum-page' %}">Forum</a></li>
             {% for crumb in breadcrumbs %}
                 <li>
-                    <a>{{ crumb.name }}</a>
+                    <a href="{{ crumb.url }}">{{ crumb.name }}</a>
                 </li>
             {% endfor %}
         </ul>
-    </div>
+    </div>    
     <div class="post-container {% if post.is_locked %}indicator{% endif %}">
         <div class="row row-editor mt-2 mb-3 ">
             <div class="editor-container">     
@@ -78,7 +78,7 @@
                         <div>
                             <div class="font-bold">
                                 <div class="text-white">
-                                    {{ post.author.get_name_with_color }}<br>
+                                    {{ post.author.get_formatted_name }}<br>
                                     {% for membership in post.author.groupmembership_set.all %}
                                         <kbd class="kbd kbd-sm mr-1" style="{{ membership.user_group.get_ug_style }}">{{ membership.user_group.name }}</kbd>
                                     {% endfor %}
@@ -128,18 +128,26 @@
                 </div>
             </div>
         </div>
-        {% if post.is_locked %}
-        <span class="indicator-item indicator-top indicator-center badge badge-warning font-bold">
-            <div class="tooltip" data-tip="Post Locked"><i data-feather="lock" style="width: 15px;"></i></div>
+        {% if post.is_pinned %}
+        <span class="indicator-item indicator-top indicator-start cursor-default">
+            <div class="tooltip" data-tip="Pinned" style="transform: rotate(282deg);">📌</div>
         </span>
-        
         {% endif %}
     </div>
 
-    <br>
-    
-    <span class="text-dark text-xs font-bold">Replies (Showing {{ replies|length }} of {{ all_replies_count }})</span>
-    
+    {% if post.is_locked %}
+    <div role="alert" class="alert my-1 cursor-default">
+        🔒
+        <span>Not open for further replies.</span>
+    </div>
+    {% endif %}
+
+    {% if replies|length > 0 %}
+    <div class="mt-2">
+        <span class="text-dark text-xs font-bold">Replies (Showing {{ replies|length }} of {{ all_replies_count }})</span>
+    </div>
+    {% endif %}
+
     <div class="replies-container">
         {% for reply in replies %}
         <div class="row row-editor mt-2 reply-container">
@@ -154,7 +162,7 @@
                         <!-- <img src="{{ reply.author.image.url }}" alt="{{ reply.author.name }}" class="w-16 h-16 rounded-md border-2 border-gray-600"/> -->
                         <div>
                             <div class="text-white font-bold">
-                                {{ reply.author.get_name_with_color }}<br>
+                                {{ reply.author.get_formatted_name }}<br>
                                 {% for membership in reply.author.groupmembership_set.all %}
                                     <kbd class="kbd kbd-sm mr-1" style="{{ membership.user_group.get_ug_style }}">{{ membership.user_group.name }}</kbd>
                                 {% endfor %}<br>
@@ -206,28 +214,10 @@
         {% endfor %}
     </div>
 
-   
-    <div class="join mt-3">
-        {% if replies.has_previous %}
-            <a href="?page={{ replies.previous_page_number }}" class="join-item btn btn-sm">«</a>
-        {% else %}
-            <button class="join-item btn btn-sm" disabled>«</button>
-        {% endif %}
-    
-        {% for num in replies.paginator.page_range %}
-            {% if replies.number == num %}
-                <button class="join-item btn btn-sm btn-active">{{ num }}</button>
-            {% else %}
-                <a href="?page={{ num }}" class="join-item btn btn-sm">{{ num }}</a>
-            {% endif %}
-        {% endfor %}
-    
-        {% if replies.has_next %}
-            <a href="?page={{ replies.next_page_number }}" class="join-item btn btn-sm">»</a>
-        {% else %}
-            <button class="join-item btn btn-sm" disabled>»</button>
-        {% endif %}
-    </div>
+    {% if replies|length > 0 %}
+    <div class="mt-3"></div>
+    {% include 'forum-admin/pagination.html' with paginator=replies page_count=page_numbers %}
+    {% endif %}
 
     {% if request.user.is_authenticated %}
     {% if not post.is_locked %}
@@ -254,7 +244,7 @@
         <hr class="mt-2 h-1 bg-gray-700 border-0 rounded">
         <div class="users-viewers mt-2 text-xs">
             {% for viewer in post.views.all %}
-                {{ viewer.get_name_with_color }}{% if not forloop.last %},{% endif %}
+                {{ viewer.get_formatted_name }}{% if not forloop.last %},{% endif %}
             {% endfor %}
         </div>
     </div>

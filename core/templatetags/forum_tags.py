@@ -13,3 +13,7 @@ def is_reply_liked(reply, profile):
 @register.simple_tag
 def is_new_post_in_node(node, profile):
     return node.new_post_alert(profile)
+
+@register.simple_tag
+def is_user_viewed_post(post, profile):
+    return post.is_current_user_viewed(profile)

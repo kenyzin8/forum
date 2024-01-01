@@ -11,6 +11,8 @@ urlpatterns = [
     path('forum/submit-reply/<int:post_id>/', views.submit_reply, name='submit-reply-page'),
     path('forum/get-post-content/', views.get_post_content, name='get-post-content-page'),
     path('forum/like-post/', views.like_post, name='like-post-page'),
+    path('forum/node/<slug:node_slug>/', views.view_node, name='view-node-page'),
+    path('forum/<slug:forum_slug>/', views.view_forum, name='view-forum-page'),
 ]
 
 if settings.DEBUG:

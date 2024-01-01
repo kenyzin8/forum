@@ -1,0 +1,51 @@
+{% if page_count > 1 %}
+<div class="join">
+    {% if page_count > 1 %}
+        {% if paginator.has_previous %}
+            <a href="?page={{ paginator.previous_page_number }}" class="join-item btn btn-sm">«</a>
+        {% else %}
+            <button class="join-item btn btn-sm" disabled>«</button>
+        {% endif %}
+
+        <a href="?page=1" class="join-item btn btn-sm {% if paginator.number == 1 %}btn-active{% endif %}">1</a>
+        
+        {% if paginator.number > 4 %}
+        <button class="join-item btn btn-disabled btn-sm">...</button>
+        {% endif %}
+
+        {% if paginator.number > 3 %}
+            <a href="?page={{ paginator.number|add:'-2' }}" class="join-item btn btn-sm">{{ paginator.number|add:'-2' }}</a>
+        {% endif %}
+        {% if paginator.number > 2 %}
+            <a href="?page={{ paginator.number|add:'-1' }}" class="join-item btn btn-sm">{{ paginator.number|add:'-1' }}</a>
+        {% endif %}
+        
+        {% if paginator.number != 1 and paginator.number != paginator.paginator.num_pages %}
+            <button class="join-item btn btn-sm btn-active">{{ paginator.number }}</button>
+        {% endif %}
+        
+        {% if paginator.number < paginator.paginator.num_pages|add:'-1' %}
+            <a href="?page={{ paginator.number|add:'1' }}" class="join-item btn btn-sm">{{ paginator.number|add:'1' }}</a>
+        {% endif %}
+        {% if paginator.number < paginator.paginator.num_pages|add:'-2' %}
+            <a href="?page={{ paginator.number|add:'2' }}" class="join-item btn btn-sm">{{ paginator.number|add:'2' }}</a>
+        {% endif %}
+        
+        {% if paginator.number < paginator.paginator.num_pages|add:'-3' %}
+        <button class="join-item btn btn-disabled btn-sm">...</button>
+        {% endif %}
+
+        <a href="?page={{ paginator.paginator.num_pages }}" class="join-item btn btn-sm {% if paginator.number == paginator.paginator.num_pages %}btn-active{% endif %}">{{ paginator.paginator.num_pages }}</a>
+        
+        {% if paginator.has_next %}
+            <a href="?page={{ paginator.next_page_number }}" class="join-item btn btn-sm">»</a>
+        {% else %}
+            <button class="join-item btn btn-sm" disabled>»</button>
+        {% endif %}
+    {% else %}
+        <button class="join-item btn btn-sm" disabled>«</button>
+        <button class="join-item btn btn-sm btn-active">1</button>
+        <button class="join-item btn btn-sm" disabled>»</button>
+    {% endif %}
+</div>
+{% endif %}
