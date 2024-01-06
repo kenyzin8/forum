@@ -6,7 +6,7 @@ from .forms import *
 
 def logout_page(request):
     django_logout(request)
-    return redirect('login-page')
+    return redirect('forum')
 
 def login_page(request):
 

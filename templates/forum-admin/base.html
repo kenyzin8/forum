@@ -65,12 +65,14 @@
     </style>
     {% block head %}{% endblock %}
 </head>
-<body class="no-scroll flex flex-col min-h-screen" data-theme="dark">
+<body class="no-scroll" data-theme="dark">
     {% include 'forum-admin/loader.html' %}
     {% include 'forum-admin/navbar.html' %}
-    <main class="m-5 content-start flex-grow m-5 content-start">
+    <main class="m-5 flex flex-col">
+        <div class="min-h-screen">
         {% block content %}
         {% endblock %}
+        </div>
     </main>
     <dialog id="error-modal" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box">

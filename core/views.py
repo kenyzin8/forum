@@ -19,8 +19,12 @@ def home(request):
 
     return render(request, 'home.html', context)
 
+#TODO: post, edit, limitations (can_post, can_edit, etc.)
+import json
 def forum(request):
-    five_latest_posts = Post.objects.filter(is_active=True).order_by('-updated_at')[:5]
+    five_latest_posts = Post.objects.filter(is_active=True).order_by('-updated_at')
+
+    five_latest_posts = five_latest_posts.exclude(login_required=True)[:5] if not request.user.is_authenticated else five_latest_posts[:5]
 
     forums = Forum.objects.filter(is_active=True)
 
@@ -28,14 +32,40 @@ def forum(request):
 
     online_users = get_online_users()
 
-    update_user_activity(request)
+    welcome_messages = WelcomeMessages.objects.filter(is_active=True)
+
+    if request.user.is_authenticated:
+        update_user_activity(request)
 
     total_posts = Post.objects.all().count()
     total_replies = Reply.objects.all().count()
     total_members = Profile.objects.all().count()
     latest_member_profile = Profile.get_latest_member()
 
-    context = { 'five_latest_posts': five_latest_posts, 'forums': forums, 'statuses': statuses, 'online_users': online_users, 'total_posts': total_posts, 'total_replies': total_replies, 'total_members': total_members, 'latest_member': latest_member_profile }
+    welcome_messages_raw = []
+
+    for message in welcome_messages:
+        msg = {
+            'message': message.message,
+            'event': message.event,
+            'image': message.image.url,
+            'announcement_url': message.announcement_url,
+            'position': message.position,
+        }
+        welcome_messages_raw.append(msg)
+
+    context = { 
+        'five_latest_posts': five_latest_posts, 
+        'forums': forums, 
+        'statuses': statuses, 
+        'online_users': online_users, 
+        'total_posts': total_posts, 
+        'total_replies': total_replies, 
+        'total_members': total_members, 
+        'latest_member': latest_member_profile,
+        'welcome_messages': welcome_messages,
+        'welcome_messages_raw': welcome_messages_raw,
+    }
 
     return render(request, 'forum.html', context)
 
@@ -43,7 +73,7 @@ def view_forum(request, forum_slug):
     nodes = Node.objects.filter(parent_forum__slug=forum_slug, is_active=True)
     forum = get_object_or_404(Forum, slug=forum_slug)
 
-    all_posts = Post.objects.filter(node__parent_forum__slug=forum_slug, is_active=True).order_by('-updated_at')
+    all_posts = Post.objects.filter(node__parent_forum__slug=forum_slug, is_active=True).order_by('-updated_at').exclude(is_pinned=True)
 
     paginator = Paginator(all_posts, 8)
     page_number = request.GET.get('page')
@@ -51,11 +81,23 @@ def view_forum(request, forum_slug):
 
     page_numbers = pages_count(all_posts)
 
-    context = {'nodes': nodes, 'parent_forum': forum, 'posts': posts, 'all_posts_count': all_posts.count(), 'page_numbers': page_numbers}
+    welcome_messages = WelcomeMessages.objects.filter(is_active=True)
+
+    pinned_posts = Post.objects.filter(node__parent_forum__slug=forum_slug, is_active=True, is_pinned=True).order_by('-updated_at')
+
+    context = {
+        'nodes': nodes, 
+        'parent_forum': forum, 
+        'posts': posts, 
+        'all_posts_count': all_posts.count(), 
+        'page_numbers': page_numbers, 
+        'welcome_messages': welcome_messages,
+        'pinned_posts': pinned_posts,
+    }
     return render(request, 'view_forum.html', context)
 
 def view_node(request, node_slug):
-    all_posts = Post.objects.filter(node__slug=node_slug, is_active=True).order_by('-updated_at')
+    all_posts = Post.objects.filter(node__slug=node_slug, is_active=True).order_by('-updated_at').exclude(is_pinned=True)
     node = get_object_or_404(Node, slug=node_slug)
     
     breadcrumbs = get_breadcrumbs(node)
@@ -66,7 +108,19 @@ def view_node(request, node_slug):
 
     page_numbers = pages_count(all_posts)
 
-    context = { 'posts': posts, 'parent_node': node, 'breadcrumbs': breadcrumbs, 'all_posts_count': all_posts.count(), 'page_numbers': page_numbers }
+    welcome_messages = WelcomeMessages.objects.filter(is_active=True)
+
+    pinned_posts = Post.objects.filter(node__slug=node_slug, is_active=True, is_pinned=True).order_by('-updated_at')
+
+    context = {
+         'posts': posts, 
+        'parent_node': node, 
+        'breadcrumbs': breadcrumbs, 
+        'all_posts_count': all_posts.count(), 
+        'page_numbers': page_numbers, 
+        'welcome_messages': welcome_messages, 
+        'pinned_posts': pinned_posts,
+    }
     return render(request, 'nodes/view_node.html', context)
 
 def view_post(request, title_slug):
@@ -87,12 +141,15 @@ def view_post(request, title_slug):
     node = post.node
     breadcrumbs = get_breadcrumbs(node)
 
-    post.views.add(request.user.profile)
+    if request.user.is_authenticated:
+        post.views.add(request.user.profile)
 
-    post_view, created = PostView.objects.get_or_create(user=request.user.profile, post=post)
-    post_view.save()
+        post_view, created = PostView.objects.get_or_create(user=request.user.profile, post=post)
+        post_view.save()
 
     page_numbers = pages_count(all_replies, 5)
+
+    welcome_messages = WelcomeMessages.objects.filter(is_active=True)
 
     context = {
         'post': post,
@@ -101,6 +158,7 @@ def view_post(request, title_slug):
         'replies_json': replies_json,
         'all_replies_count': all_replies.count(),
         'page_numbers': page_numbers,
+        'welcome_messages': welcome_messages,
     }
 
     return render(request, 'posts/view_post.html', context)

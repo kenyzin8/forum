@@ -11,15 +11,28 @@ import datetime
 from .helper import *
 
 class WelcomeMessages(models.Model):
-    message = models.TextField()
+    message = models.TextField(help_text="Use 'USER' in the message, and it will be replaced with the user's name.")
     event = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='welcome/', null=True, blank=True)
+    image = models.ImageField(upload_to='welcome/', null=True, blank=True, help_text="Recommended size: 1920x1080")
     announcement_url = models.URLField(null=True, blank=True)
+    url_format = models.TextField(max_length=200, null=True, blank=True, help_text="Use 'ANNOUNCEMENT_URL' in the format, and it will be replaced with the actual link (Word: 'here').")
     position = models.IntegerField(default=0)
 
     is_active = models.BooleanField(default=True)
 
     login_required = models.BooleanField(default=False)
+
+    is_centered = models.BooleanField(default=False, help_text="Center the message on the page if needed such as short message.")
+
+    def dynamic_message_text(self, user_profile):
+        if self.message:
+            return self.message.replace('USER', user_profile.name)
+
+    def dynamic_url_text(self):
+        if self.url_format:
+            anchor_tag = f"<a class='link no-underline text-primary font-semibold tooltip mx-auto' href='{self.announcement_url}' target='_blank'>here</a>"
+            return self.url_format.replace('ANNOUNCEMENT_URL', anchor_tag)
+        return f"Click <a class='link no-underline text-primary font-semibold tooltip mx-auto' href='{self.announcement_url}' target='_blank'>here</a> to visit our announcement"
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -93,6 +106,10 @@ class Profile(models.Model):
 
     is_verified = models.BooleanField(default=False)
 
+    # settings
+    hide_welcome_message = models.BooleanField(default=False)
+    # and more to come
+
     @classmethod
     def get_latest_member(cls):
         return cls.objects.order_by('-user__date_joined').first()
@@ -126,7 +143,7 @@ class Profile(models.Model):
         return self.post_likes.count() + self.reply_likes.count()
 
     def get_total_messages(self):
-        return self.message_set.count() + self.reply_set.count()
+        return self.message_set.count() + self.reply_set.count() + self.post_set.count()
 
     def __str__(self):
         return self.name
@@ -273,17 +290,22 @@ class Node(models.Model):
             return None
         
     def new_post_alert(self, user_profile):
-        latest_content = self.get_latest_post_or_reply()
+        all_posts = self.post_set.all()
 
-        if latest_content:
-            # Check if latest_content is an instance of Post or Reply
-            related_post = latest_content if isinstance(latest_content, Post) else latest_content.post
-
+        for post in all_posts:
             try:
-                post_view = PostView.objects.get(user=user_profile, post=related_post)
-                return related_post.updated_at > post_view.last_viewed
+                post_view = PostView.objects.get(user=user_profile, post=post)
+
+                if post.updated_at > post_view.last_viewed:
+                    return True
+
+                new_replies = Reply.objects.filter(post=post, created_at__gt=post_view.last_viewed, is_active=True)
+                if new_replies.exists():
+                    return True
+
             except PostView.DoesNotExist:
                 return True
+
         return False
 
     def save(self, *args, **kwargs):
@@ -357,6 +379,8 @@ class Post(models.Model):
     node = models.ForeignKey(Node, on_delete=models.CASCADE, null=True, blank=True)
 
     slug = models.SlugField(null=True, blank=True, unique=True)
+
+    login_required = models.BooleanField(default=False)
 
     def is_liked_by_user(self, profile):
         return self.likes.filter(id=profile.id).exists()

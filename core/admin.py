@@ -51,6 +51,11 @@ class PostViewAdmin(admin.ModelAdmin):
     list_display = ('user', 'post', 'last_viewed')
     search_fields = ('user', 'post', 'last_viewed')
 
+class WelcomeMessageAdmin(admin.ModelAdmin):
+    list_display = ('message', 'event', 'is_active', 'position')
+    search_fields = ('message', 'event')
+
+
 admin.site.register(Forum, ForumAdmin)
 admin.site.register(Node, NodeAdmin)
 admin.site.register(Profile, ProfileAdmin)
@@ -62,3 +67,4 @@ admin.site.register(Prefix, PrefixAdmin)
 admin.site.register(UserGroup, UserGroupAdmin)
 admin.site.register(Status, StatusAdmin)
 admin.site.register(PostView, PostViewAdmin)
+admin.site.register(WelcomeMessages, WelcomeMessageAdmin)
