@@ -8,6 +8,7 @@ from django.utils import timezone
 
 import datetime
 import uuid
+import json
 
 from .models import *
 from .helper import *
@@ -20,7 +21,7 @@ def home(request):
     return render(request, 'home.html', context)
 
 #TODO: post, edit, limitations (can_post, can_edit, etc.)
-import json
+
 def forum(request):
     five_latest_posts = Post.objects.filter(is_active=True).order_by('-updated_at')
 

@@ -28,6 +28,10 @@ class WelcomeMessages(models.Model):
         if self.message:
             return self.message.replace('USER', user_profile.name)
 
+    def guest_message_text(self):
+        if self.message:
+            return self.message.replace('USER', 'Guest')
+
     def dynamic_url_text(self):
         if self.url_format:
             anchor_tag = f"<a class='link no-underline text-primary font-semibold tooltip mx-auto' href='{self.announcement_url}' target='_blank'>here</a>"
