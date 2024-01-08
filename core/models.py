@@ -34,9 +34,9 @@ class WelcomeMessages(models.Model):
 
     def dynamic_url_text(self):
         if self.url_format:
-            anchor_tag = f"<a class='link no-underline text-primary font-semibold tooltip mx-auto' href='{self.announcement_url}' target='_blank'>here</a>"
+            anchor_tag = f"<a class='link no-underline text-primary tooltip mx-auto kbd kbd-sm' href='{self.announcement_url}' target='_blank' data-tip='{self.announcement_url}'>here</a>"
             return self.url_format.replace('ANNOUNCEMENT_URL', anchor_tag)
-        return f"Click <a class='link no-underline text-primary font-semibold tooltip mx-auto' href='{self.announcement_url}' target='_blank'>here</a> to visit our announcement"
+        return f"Click <a class='link no-underline text-primary tooltip mx-auto kbd kbd-sm' href='{self.announcement_url}' target='_blank' data-tip='{self.announcement_url}'>here</a> to visit our announcement"
 
     def save(self, *args, **kwargs):
         if not self.pk:

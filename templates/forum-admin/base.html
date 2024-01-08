@@ -14,8 +14,16 @@
 
     <script src="{% static 'feather-icons/js/feather.min.js' %}"></script>
     <script src="{% static 'jQuery/jquery-3.6.4.min.js' %}"></script>
-    <script src="{% static 'daisy/js/full.min.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'flowbite/flowbite.min.css' %}">
+    <script src="{% static 'flowbite/flowbite.min.js' %}"></script>
+
     <link rel="stylesheet" href="{% static 'daisy/css/full.min.css' %}"/>
+    <script src="{% static 'daisy/js/full.min.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'aos/aos.css' %}"/>
+    <script src="{% static 'aos/aos.js' %}"></script>
+    
     <script>
         function showError(message){
             var errorModal = document.getElementById('error-modal')
@@ -62,6 +70,15 @@
             overflow-y: hidden;
         }
 
+        [data-aos] {
+            pointer-events: none;
+        }
+        .aos-animate {
+            pointer-events: auto;
+        }
+        .aos-init[data-aos][data-aos].aos-animate {
+            transform: unset;
+        }
     </style>
     {% block head %}{% endblock %}
 </head>
@@ -100,6 +117,10 @@
     {% block scripts %}{% endblock %}
     <script>
       feather.replace();
+      AOS.init();
     </script>
+<script>
+    
+</script>
 </body>
 </html>

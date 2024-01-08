@@ -54,7 +54,7 @@ function SpecialCharactersEmoji( editor ) {
 watchdog
 	.create( document.querySelector( '.comment-editor' ), {
 		link: {addTargetToExternalLinks: true},
-		mediaEmbed: {previewsInData: true},
+		mediaEmbed: {previewsInData: true, removeProviders: ['spotify', 'twitter', 'facebook', 'instagram', 'flickr', 'googleMaps']},
 		wordCount: {
             onUpdate: stats => {
 				document.getElementById('comment-word-count-body').textContent = stats.words;

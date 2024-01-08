@@ -62407,7 +62407,11 @@
                         url: [/^open\.spotify\.com\/(artist\/\w+)/, /^open\.spotify\.com\/(album\/\w+)/, /^open\.spotify\.com\/(track\/\w+)/],
                         html: t => {
                             const e = t[1];
-                            return '<div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 126%;">' + `<iframe src="https://open.spotify.com/embed/${e}" ` + 'style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;" ' + 'frameborder="0" allowtransparency="true" allow="encrypted-media">' + "</iframe>" + "</div>"
+                            return '<div style="position: relative; padding-bottom: 0%; height: 10rem;">' +
+                            `<iframe src="https://open.spotify.com/embed/${e}" ` +
+                            'style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;" ' +
+                            'frameborder="0" allowtransparency="true" allow="encrypted-media">' +
+                            "</iframe></div>";
                         }
                     }, {
                         name: "youtube",
@@ -62416,7 +62420,7 @@
                             const e = t[1];
                             const n = t[2];
                             return '<div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;">' 
-                            + `<iframe src="https://www.youtube.com/embed/${e}${n?`?start=${n}`:""}" ` 
+                            + `<iframe allowtransparency="true" src="https://www.youtube.com/embed/${e}${n?`?start=${n}`:""}" ` 
                             + 'style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;" ' 
                             + 'frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>' 
                             + "</iframe>" 
@@ -62427,7 +62431,7 @@
                         url: [/^vimeo\.com\/(\d+)/, /^vimeo\.com\/[^/]+\/[^/]+\/video\/(\d+)/, /^vimeo\.com\/album\/[^/]+\/video\/(\d+)/, /^vimeo\.com\/channels\/[^/]+\/(\d+)/, /^vimeo\.com\/groups\/[^/]+\/videos\/(\d+)/, /^vimeo\.com\/ondemand\/[^/]+\/(\d+)/, /^player\.vimeo\.com\/video\/(\d+)/],
                         html: t => {
                             const e = t[1];
-                            return '<div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;">' + `<iframe src="https://player.vimeo.com/video/${e}" ` + 'style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;" ' + 'frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen>' + "</iframe>" + "</div>"
+                            return '<div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 41.5%;">' + `<iframe allowtransparency="true" src="https://player.vimeo.com/video/${e}" ` + 'style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;" ' + 'frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen>' + "</iframe>" + "</div>"
                         }
                     }, {
                         name: "instagram",

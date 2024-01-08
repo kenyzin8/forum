@@ -73,7 +73,7 @@
                 <div class="p-3 mt-2 border border-gray-800 author-panel">
                     <div class="flex items-center space-x-4">
                         <div class="avatar ml-2">
-                            <div class="w-24 rounded-full ring ring-offset-base-100 ring-offset-2" style="--tw-ring-color: {{ post.author.get_color }};">
+                            <div class="lg:w-24 md:w-24 w-16 lg:rounded-full md:rounded-full rounded-sm ring ring-offset-base-200 ring-offset-2" style="--tw-ring-color: {{ post.author.get_color }};">
                                 <img src="{{ post.author.image.url }}" alt="{{ post.author.name }}"/>
                             </div>
                         </div>
@@ -98,22 +98,22 @@
                         {{ post.content|safe }}
                     </div>
                 </div>
-                <div id="date-posted" class="flex justify-between items-center">
-                    <div class="text-xs py-2">
+                <div id="date-posted" class="flex flex-col lg:flex-row justify-between items-start lg:items-center">
+                    <div class="text-xs py-2 ml-1">
                         {{ post.formatted_created_at }}
                         ·
                         <span class="mr-2">Liked by <span class="like-post-count">{{ post.likes.count }}</span> people</span>
                     </div>
                     {% if request.user.is_authenticated %}
-                    <div class="text-end mr-2"> 
+                    <div class="text-end mr-2 mt-0 mb-1 md:mb-0"> 
                         <div>
                             {% if request.user.profile == post.author %}
-                            <a class="link link-primary text-orange-500 no-underline edit-button ml-2" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
+                            <a class="link link-primary text-orange-500 no-underline edit-button ml-1" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
                                 Edit
                             </a>
                             ·
                             {% endif %}
-                            <button class="link link-primary text-orange-500 no-underline report-button" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
+                            <button class="link link-primary text-orange-500 no-underline report-button {% if request.user.profile != post.author %}ml-1{% endif %}" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
                                 Report
                             </button>
                             ·
@@ -160,7 +160,7 @@
                 <div class="p-3 mt-2 border border-gray-800 author-panel">
                     <div class="flex items-center space-x-4">
                         <div class="avatar ml-2">
-                            <div class="w-24 rounded-full ring ring-offset-base-100 ring-offset-2" style="--tw-ring-color: {{ reply.author.get_color }};">
+                            <div class="lg:w-24 md:w-24 w-16 lg:rounded-full md:rounded-full rounded-sm ring ring-offset-base-200 ring-offset-2" style="--tw-ring-color: {{ reply.author.get_color }};">
                                 <img src="{{ reply.author.image.url }}" alt="{{ reply.author.name }}"/>
                             </div>
                         </div>
@@ -183,22 +183,22 @@
                         {{ reply.content|safe }}
                     </div>
                 </div>
-                <div id="date-posted" class="flex justify-between items-center">
-                    <div class="text-xs py-2">
+                <div id="date-posted" class="flex flex-col lg:flex-row justify-between items-start lg:items-center">
+                    <div class="text-xs py-2 ml-1">
                         {{ reply.formatted_created_at }}
                         ·
                         <span class="mr-2">Liked by <span class="like-post-count">{{ reply.likes.count }}</span> people</span>
                     </div>
                     {% if request.user.is_authenticated %}
-                    <div class="text-end mr-2"> 
+                    <div class="text-end mr-2 mt-0 mb-1 md:mb-0"> 
                         <div>
                             {% if request.user.profile == reply.author %}
-                            <a class="link link-primary text-orange-500 no-underline edit-button ml-2" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
+                            <a class="link link-primary text-orange-500 no-underline edit-button ml-1" data-post-id="{{ post.id }}" data-reply-user="{{ post.author.name }}">
                                 Edit
                             </a>
                             ·
                             {% endif %}
-                            <button class="link link-primary text-orange-500 no-underline report-button" data-reply-id="{{ reply.id }}" data-reply-user="{{ reply.author.name }}">
+                            <button class="link link-primary text-orange-500 no-underline report-button {% if request.user.profile != reply.author %}ml-1{% endif %}" data-reply-id="{{ reply.id }}" data-reply-user="{{ reply.author.name }}">
                                 Report
                             </button>
                             ·
@@ -228,7 +228,7 @@
 
     {% if request.user.is_authenticated %}
     {% if not post.is_locked %}
-    <div class="row row-editor mt-3" id="new-reply">
+    <div class="row row-editor mt-3" id="new-reply" data-aos="fade-right" data-aos-once="true">
         <div class="comment-editor-container">      
             <div class="text-dark text-xs font-bold mb-2 ml-2">Reply</div>   
             <div class="comment-editor">
@@ -246,7 +246,7 @@
     {% endif %}
     {% endif %}
 
-    <div class="rounded viewers mt-4 p-4" style="background: #1C1C1C;">
+    <div class="rounded viewers mt-4 p-4" style="background: #1C1C1C;" data-aos="fade-right" data-aos-once="true">
         Post Viewers <span class="text-xs">(Total: {{ post.views.count }})</span>
         <hr class="mt-2 h-1 bg-gray-700 border-0 rounded">
         <div class="users-viewers mt-2 text-xs">

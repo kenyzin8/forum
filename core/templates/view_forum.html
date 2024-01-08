@@ -142,12 +142,14 @@
         <br>
 
         {% if pinned_posts %}
-        <span class="latest-post-title font-bold inline-block align-middle">Pinned Posts</span>
+        <div data-aos="fade-right" data-aos-once="true">
+            <span class="latest-post-title font-bold inline-block align-middle">Pinned Posts</span>
+        </div>
         {% for post in pinned_posts %}
         {% if request.user.is_authenticated %}
         {% is_user_viewed_post post request.user.profile as IUVP %}
         {% endif %}
-        <div class="mt-4 rounded {% if post.is_locked or post.is_pinned %}indicator{% endif %}">
+        <div class="mt-4 rounded {% if post.is_locked or post.is_pinned %}indicator{% endif %}" data-aos="fade-right" data-aos-offset="30" data-aos-once="true">
             {% if post.is_locked %}
             <span class="indicator-item indicator-top indicator-start cursor-default {% if post.is_pinned %}ml-5{% endif %}">
                 <div class="tooltip" data-tip="Locked">🔒</div>
@@ -234,7 +236,7 @@
 
         {% if posts %}
         <div class="flex justify-between">
-            <div>
+            <div data-aos="fade-right" data-aos-offset="30" data-aos-once="true">
                 <span class="latest-post-title font-bold inline-block align-middle">Posts</span>
                 <span class="latest-post-title font-bold inline-block align-middle text-gray-300 text-xs ml-1">(Showing {{ posts|length }} of {{ all_posts_count }})</span>
             </div>
@@ -244,7 +246,7 @@
         {% if request.user.is_authenticated %}
         {% is_user_viewed_post post request.user.profile as IUVP %}
         {% endif %}
-        <div class="mt-3 rounded {% if post.is_locked or post.is_pinned %}indicator{% endif %}">
+        <div class="mt-3 rounded {% if post.is_locked or post.is_pinned %}indicator{% endif %}" data-aos="fade-right" data-aos-offset="30" data-aos-once="true">
             {% if post.is_locked %}
             <span class="indicator-item indicator-top indicator-start cursor-default {% if post.is_pinned %}ml-5{% endif %}">
                 <div class="tooltip" data-tip="Locked">🔒</div>

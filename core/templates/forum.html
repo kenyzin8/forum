@@ -7,8 +7,7 @@
 {% block title %}Forum{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'flowbite/flowbite.min.css' %}">
-<script src="{% static 'flowbite/flowbite.min.js' %}"></script>
+
 <style>
     .indicator {
         display: block !important;
@@ -28,13 +27,15 @@
 <div class="text-white max-w-screen-2xl mx-auto mt-16 flex">
     <div class="flex-grow">
         {% include 'welcome_messages.html' %}
-        <span class="latest-post-title font-bold">Latest Posts</span>
+        <div data-aos="fade-right" data-aos-once="true">
+            <span class="latest-post-title font-bold">Latest Posts</span>
+        </div>
         <div class="five-latest-post-container">
             {% for post in five_latest_posts %}
             {% if request.user.is_authenticated %}
             {% is_user_viewed_post post request.user.profile as IUVP %}
             {% endif %}
-            <div class="mt-3 rounded {% if post.is_locked or post.is_pinned %}indicator{% endif %}">
+            <div class="mt-3 rounded {% if post.is_locked or post.is_pinned %}indicator{% endif %}" data-aos="fade-right" data-aos-offset="30" data-aos-once="true">
                 {% if post.is_locked %}
                 <span class="indicator-item indicator-top indicator-start cursor-default {% if post.is_pinned %}ml-5{% endif %}">
                     <div class="tooltip" data-tip="Locked">🔒</div>
@@ -70,7 +71,7 @@
                                             {{ post.node.name }}
                                         </a>
                                         <span class="sm:hidden"> 
-                                            · Replies:&nbsp;{{ post.total_replies }} · Views:&nbsp;{{ post.total_views }} · Latest Reply:<a class="link no-underline">&nbsp;{{ post.get_latest_reply.formatted_created_at }}&nbsp;by&nbsp;{{ post.get_latest_reply_author.get_formatted_name }}</a>
+                                            · Replies:&nbsp;{{ post.total_replies }} · Views:&nbsp;{{ post.total_views }} · Latest Reply:<a class="link no-underline">{{ post.get_latest_reply.formatted_created_at }}&nbsp;by&nbsp;{{ post.get_latest_reply_author.get_formatted_name }}</a>
                                         </span>
                                     </div>
                                 </div>
@@ -119,9 +120,11 @@
         <br>
 
         <div class="forum-wrapper">
-            <span class="latest-post-title font-bold mt-3">Forum</span>
+            <div data-aos="fade-right" data-aos-once="true">
+                <span class="latest-post-title font-bold mt-3" >Forum</span>
+            </div>
             {% for forum in forums %}
-            <div class='{{ forum.slug }}'>
+            <div class='{{ forum.slug }}' data-aos="fade-right" data-aos-once="true">
                 <div class="mt-4 rounded"> 
                     <!-- add indicator if indicator needed -->
                     <!-- <span class="indicator-item indicator-center badge">{{ forum.upper_title }}</span> -->
@@ -178,8 +181,8 @@
                                                 href="{% url 'view-post-page' node.get_latest_post.slug %}"
                                                 {% endif %}
                                             >
-                                                &nbsp;{{ node.get_latest_post_or_reply.formatted_updated_at }}
-                                                &nbsp;by&nbsp;{{ node.get_latest_post_or_reply.author.get_formatted_name }}
+                                                {{ node.get_latest_post_or_reply.formatted_updated_at }}
+                                                by&nbsp;{{ node.get_latest_post_or_reply.author.get_formatted_name }}
                                             </a>
                                             {% endif %}
                                         </span>
@@ -263,7 +266,7 @@
     </div>
     <div class="hidden lg:block md:hidden sm:hidden w-72 ml-5 {% if not welcome_messages or request.user.profile.hide_welcome_message %}mt-9{% endif %} sidebar">
         {% if request.user.is_authenticated %}
-        <div class="h-auto p-4 bg-gray-800 rounded">
+        <div class="h-auto p-4 bg-gray-800 rounded" data-aos="fade-left" data-aos-once="true">
             <div>
                 <div class="flex break-all">
                     <div class="avatar">
@@ -293,7 +296,7 @@
             </div>
         </div>
         {% endif %}
-        <div class="h-auto p-4 bg-gray-800 mt-2 rounded">
+        <div class="h-auto p-4 bg-gray-800 mt-2 rounded" data-aos="fade-left" data-aos-once="true">
             <div class="flex flex-col mt-2 font-bold text-center">
                 <span class="text-white">STATUS UPDATES</span>
                 <div class="divider my-2"></div>
@@ -340,7 +343,7 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="h-auto p-4 bg-gray-800 mt-2 rounded">
+        <div class="h-auto p-4 bg-gray-800 mt-2 rounded" data-aos="fade-left" data-aos-once="true">
             <div class="flex flex-col mt-2 font-bold text-center">
                 <span class="text-white">ONLINE USERS</span>
                 <div class="divider my-2"></div>
@@ -359,7 +362,7 @@
                 Total: {{ online_users|length|intcomma }}
             </div>
         </div>
-        <div class="h-auto p-4 bg-gray-800 mt-2 rounded">
+        <div class="h-auto p-4 bg-gray-800 mt-2 rounded" data-aos="fade-left" data-aos-once="true">
             <div class="flex flex-col mt-2 font-bold text-center">
                 <span class="text-white">FORUM STATISTICS</span>
                 <div class="divider my-2"></div>
@@ -406,8 +409,5 @@
 
 <script>
     var welcome_messages = JSON.parse(document.getElementById('welcome_messages').textContent);
-    console.log(welcome_messages)
-    // console.log(document.getElementById('foo').offsetWidth)
 </script>
-
 {% endblock %}
